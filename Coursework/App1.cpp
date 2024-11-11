@@ -64,6 +64,7 @@ bool App1::render()
 	// Clear the scene. (default blue colour)
 	renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
 
+	time += timer->getTime();
 	// Generate the view matrix based on the camera's position.
 	camera->update();
 
@@ -95,9 +96,9 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
-	ImGui::SliderFloat("Amplitude", &amplitude, 1.0f, 100.0f);
-	ImGui::SliderFloat("Frequency", &frequency, 1.0f, 100.0f);
-	ImGui::SliderFloat("Speed", &speed, 1.0f, 100.0f);
+	ImGui::SliderFloat("Amplitude", &amplitude, 0.1f, 1.0f);
+	ImGui::SliderFloat("Frequency", &frequency, 0.1f, 1.0f);
+	ImGui::SliderFloat("Speed", &speed, 1.0f, 5.0f);
 
 	// Render UI
 	ImGui::Render();

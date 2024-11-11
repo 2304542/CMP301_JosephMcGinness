@@ -29,8 +29,8 @@ private:
 
 	float time;
 
-	float amplitude = 1.0f;
-	float frequency = 1.0f;
+	float amplitude = 0.1f;
+	float frequency = 0.1f;
 	float speed = 1.0f;
 
 };
