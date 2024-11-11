@@ -191,7 +191,6 @@
     <ClInclude Include="FPCamera.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="LightShader.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="OrthoMesh.h" />
     <ClInclude Include="PlaneMesh.h" />
@@ -223,7 +222,6 @@
     <ClCompile Include="FPCamera.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Light.cpp" />
-    <ClCompile Include="LightShader.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="OrthoMesh.cpp" />
     <ClCompile Include="PlaneMesh.cpp" />
@@ -238,20 +236,6 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="TokenStream.cpp" />
     <ClCompile Include="TriangleMesh.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="light_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="light_vs.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

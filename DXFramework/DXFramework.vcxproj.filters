@@ -138,9 +138,6 @@
     <ClInclude Include="..\include\imGUI\stb_truetype.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="LightShader.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseMesh.cpp">
@@ -230,16 +227,5 @@
     <ClCompile Include="..\include\imGUI\imgui_impl_win32.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="LightShader.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="light_ps.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="light_vs.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>

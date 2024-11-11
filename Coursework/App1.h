@@ -4,6 +4,7 @@
 
 // Includes
 #include "DXF.h"
+#include "ManipulationShader.h"
 
 
 class App1 : public BaseApplication
@@ -24,6 +25,13 @@ private:
 	PlaneMesh* mesh;
 	PlaneMesh* sand;
 	Light* light;
+	ManipulationShader* shader;
+
+	float time;
+
+	float amplitude = 1.0f;
+	float frequency = 1.0f;
+	float speed = 1.0f;
 
 };
 

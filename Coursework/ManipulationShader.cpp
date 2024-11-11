@@ -1,12 +1,12 @@
-#include "LightShader.h"
+#include "ManipulationShader.h"
 
-LightShader::LightShader(ID3D11Device* device, HWND hwnd) : BaseShader(device, hwnd)
+ManipulationShader::ManipulationShader(ID3D11Device* device, HWND hwnd) : BaseShader(device, hwnd)
 {
-	initShader(L"light_vs.cso", L"light_ps.cso");
+	initShader(L"manipulation_vs.cso", L"manipulation_ps.cso");
 }
 
 
-LightShader::~LightShader()
+ManipulationShader::~ManipulationShader()
 {
 	// Release the sampler state.
 	if (sampleState)
@@ -20,6 +20,12 @@ LightShader::~LightShader()
 	{
 		matrixBuffer->Release();
 		matrixBuffer = 0;
+	}
+
+	if (timeBuffer) {
+
+		timeBuffer->Release();
+		timeBuffer = 0;
 	}
 
 	// Release the layout.
@@ -40,11 +46,12 @@ LightShader::~LightShader()
 	BaseShader::~BaseShader();
 }
 
-void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilename)
+void ManipulationShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilename)
 {
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
 	D3D11_BUFFER_DESC lightBufferDesc;
+	D3D11_BUFFER_DESC timeBufferDesc;
 
 	// Load (+ compile) shader files
 	loadVertexShader(vsFilename);
@@ -82,10 +89,21 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 	lightBufferDesc.StructureByteStride = 0;
 	renderer->CreateBuffer(&lightBufferDesc, NULL, &lightBuffer);
 
+	// Setup light buffer
+	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
+	// Note that ByteWidth always needs to be a multiple of 16 if using D3D11_BIND_CONSTANT_BUFFER or CreateBuffer will fail.
+	timeBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	timeBufferDesc.ByteWidth = sizeof(TimeBufferType);
+	timeBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	timeBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	timeBufferDesc.MiscFlags = 0;
+	timeBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer(&timeBufferDesc, NULL, &timeBuffer);
+
 }
 
 
-void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, Light* light)
+void ManipulationShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, Light* light, float time, float amplitude, float speed, float frequency)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -116,6 +134,18 @@ void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	lightPtr->padding = 0.0f;
 	deviceContext->Unmap(lightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);
+
+	//Additional
+	// Send time data to pixel shader
+	TimeBufferType* timePtr;
+	deviceContext->Map(timeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	timePtr = (TimeBufferType*)mappedResource.pData;
+	timePtr->time = time;
+	timePtr->amplitude = amplitude;
+	timePtr->speed = speed;
+	timePtr->frequency = frequency;
+	deviceContext->Unmap(timeBuffer, 0);
+	deviceContext->VSSetConstantBuffers(1, 1, &timeBuffer);
 
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &texture);
