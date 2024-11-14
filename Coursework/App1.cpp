@@ -83,10 +83,10 @@ bool App1::render()
 	sea->sendData(renderer->getDeviceContext());
 	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), light, time, amplitude, speed, frequency);
 	shader->render(renderer->getDeviceContext(), sea->getIndexCount());
-	XMMatrixTranslation(100.0f, 100.0f, 100.0f);
-	sand->sendData(renderer->getDeviceContext());
-	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sand"), light, 0, 0, 0, 0);
-	shader->render(renderer->getDeviceContext(), sand->getIndexCount());
+	//XMMatrixTranslation(100.0f, 100.0f, 100.0f);
+	//sand->sendData(renderer->getDeviceContext());
+	//shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sand"), light, 0, 0, 0, 0);
+	//shader->render(renderer->getDeviceContext(), sand->getIndexCount());
 	
 	// Render GUI
 	gui();
