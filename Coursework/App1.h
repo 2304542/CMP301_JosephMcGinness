@@ -22,7 +22,7 @@ protected:
 	void gui();
 
 private:
-	PlaneMesh* mesh;
+	PlaneMesh* sea;
 	PlaneMesh* sand;
 	Light* light;
 	ManipulationShader* shader;

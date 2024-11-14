@@ -4,7 +4,8 @@
 
 App1::App1()
 {
-	mesh = nullptr;
+	sea = nullptr;
+	sand = nullptr;
 }
 
 void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight, Input* in, bool VSYNC, bool FULL_SCREEN)
@@ -13,10 +14,12 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
 
 	// Create Mesh object and shader object
-	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
+	sea = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	textureMgr->loadTexture(L"sea", L"res/sea.jpg");
 	shader = new ManipulationShader(renderer->getDevice(), hwnd);
 
+	sand = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
+	textureMgr->loadTexture(L"sand", L"res/sand.jpg");
 	// Confirgure directional light
 	light = new Light();
 	light->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
@@ -30,10 +33,16 @@ App1::~App1()
 	BaseApplication::~BaseApplication();
 
 	// Release the Direct3D object.
-	if (mesh)
+	if (sea)
 	{
-		delete mesh;
-		mesh = 0;
+		delete sea;
+		sea = 0;
+	}
+
+	if (sand)
+	{
+		delete sand;
+		sand = 0;
 	}
 
 }
@@ -63,20 +72,22 @@ bool App1::render()
 {
 	// Clear the scene. (default blue colour)
 	renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
-
 	time += timer->getTime();
 	// Generate the view matrix based on the camera's position.
 	camera->update();
-
 	// Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
-	mesh->sendData(renderer->getDeviceContext());
+	sea->sendData(renderer->getDeviceContext());
 	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), light, time, amplitude, speed, frequency);
-	shader->render(renderer->getDeviceContext(), mesh->getIndexCount());
-
+	shader->render(renderer->getDeviceContext(), sea->getIndexCount());
+	XMMatrixTranslation(100.0f, 100.0f, 100.0f);
+	sand->sendData(renderer->getDeviceContext());
+	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sand"), light, 0, 0, 0, 0);
+	shader->render(renderer->getDeviceContext(), sand->getIndexCount());
+	
 	// Render GUI
 	gui();
 
