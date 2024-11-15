@@ -76,17 +76,21 @@ bool App1::render()
 	// Generate the view matrix based on the camera's position.
 	camera->update();
 	// Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
-	XMMATRIX worldMatrix = renderer->getWorldMatrix();
-	XMMATRIX viewMatrix = camera->getViewMatrix();
-	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
+	XMMATRIX oceanWorldMatrix = renderer->getWorldMatrix();
+	XMMATRIX oceanViewMatrix = camera->getViewMatrix();
+	XMMATRIX oceanProjectionMatrix = renderer->getProjectionMatrix();
 
 	sea->sendData(renderer->getDeviceContext());
-	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), light, time, amplitude, speed, frequency);
+	shader->setShaderParameters(renderer->getDeviceContext(), oceanWorldMatrix, oceanViewMatrix, oceanProjectionMatrix, textureMgr->getTexture(L"sea"), light, time, amplitude, speed, frequency);
 	shader->render(renderer->getDeviceContext(), sea->getIndexCount());
-	//XMMatrixTranslation(100.0f, 100.0f, 100.0f);
-	//sand->sendData(renderer->getDeviceContext());
-	//shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sand"), light, 0, 0, 0, 0);
-	//shader->render(renderer->getDeviceContext(), sand->getIndexCount());
+
+	XMMATRIX beachWorldMatrix = renderer->getWorldMatrix();
+	XMMATRIX beachViewMatrix = camera->getViewMatrix();
+	XMMATRIX beachProjectionMatrix = renderer->getProjectionMatrix();
+	beachWorldMatrix = XMMatrixTranslation(0.0, 0.0, -100.0);
+	sand->sendData(renderer->getDeviceContext());
+	shader->setShaderParameters(renderer->getDeviceContext(), beachWorldMatrix, beachViewMatrix, beachProjectionMatrix, textureMgr->getTexture(L"sand"), light, 0, 0, 0, 0);
+	shader->render(renderer->getDeviceContext(), sand->getIndexCount());
 	
 	// Render GUI
 	gui();
@@ -107,7 +111,7 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
-	ImGui::SliderFloat("Amplitude", &amplitude, 0.1f, 1.0f);
+	ImGui::SliderFloat("Amplitude", &amplitude, 0.1f, 0.25f);
 	ImGui::SliderFloat("Frequency", &frequency, 0.1f, 1.0f);
 	ImGui::SliderFloat("Speed", &speed, 1.0f, 5.0f);
 
