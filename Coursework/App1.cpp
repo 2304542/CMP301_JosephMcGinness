@@ -12,7 +12,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 {
 	// Call super/parent init function (required!)
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
-
+	camera->setPosition(0.0f, 10.0f, 0.0f);
 	// Create Mesh object and shader object
 	sea = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	textureMgr->loadTexture(L"sea", L"res/sea.jpg");
@@ -76,7 +76,7 @@ bool App1::render()
 	// Generate the view matrix based on the camera's position.
 	camera->update();
 	// Get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
-	XMMATRIX oceanWorldMatrix = renderer->getWorldMatrix();
+	XMMATRIX oceanWorldMatrix = renderer->getWorldMatrix(); 
 	XMMATRIX oceanViewMatrix = camera->getViewMatrix();
 	XMMATRIX oceanProjectionMatrix = renderer->getProjectionMatrix();
 

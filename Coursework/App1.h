@@ -27,9 +27,9 @@ private:
 	Light* light;
 	ManipulationShader* shader;
 
-	float time;
+	float time; // enables wave movement 
 
-	float amplitude = 0.1f;
+	float amplitude = 0.1f; // height of waves
 	float frequency = 0.1f;
 	float speed = 1.0f;
 
