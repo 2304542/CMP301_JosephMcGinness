@@ -30,10 +30,10 @@ struct OutputType
 };
 /*float3 CalculateNormals(float2 uv) {
     float offset = 1.0f / 1000.0f;
-    float hRight = HeightMap.SampleLevel(sampler0, texCoord + float2(0.001, 0.0), 0);
-    float hLeft = HeightMap.SampleLevel(sampler0, texCoord - float2(0.001, 0.0), 0);
-    float hTop = HeightMap.SampleLevel(sampler0, texCoord + float2(0.0, 0.001), 0);
-    float hBottom = HeightMap.SampleLevel(sampler0, texCoord - float2(0.0, 0.001), 0);
+    float hRight = HeightMap.SampleLevel(sampler0, uv + float2(0.001, 0.0), 0);
+    float hLeft = HeightMap.SampleLevel(sampler0, uv - float2(0.001, 0.0), 0);
+    float hTop = HeightMap.SampleLevel(sampler0, uv + float2(0.0, 0.001), 0);
+    float hBottom = HeightMap.SampleLevel(sampler0, uv - float2(0.0, 0.001), 0);
 
     float step = 100.0f * diff;
     float3 tan = normalize(float3(2.0f * step, hRight - hLeft, 0));
