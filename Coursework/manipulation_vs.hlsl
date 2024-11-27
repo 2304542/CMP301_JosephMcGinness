@@ -1,4 +1,5 @@
 
+
 cbuffer MatrixBuffer : register(b0)
 {
 
@@ -28,20 +29,7 @@ struct OutputType
     float2 tex : TEXCOORD0;
     float3 normal : NORMAL;
 };
-/*float3 CalculateNormals(float2 uv) {
-    float offset = 1.0f / 1000.0f;
-    float hRight = HeightMap.SampleLevel(sampler0, uv + float2(0.001, 0.0), 0);
-    float hLeft = HeightMap.SampleLevel(sampler0, uv - float2(0.001, 0.0), 0);
-    float hTop = HeightMap.SampleLevel(sampler0, uv + float2(0.0, 0.001), 0);
-    float hBottom = HeightMap.SampleLevel(sampler0, uv - float2(0.0, 0.001), 0);
 
-    float step = 100.0f * diff;
-    float3 tan = normalize(float3(2.0f * step, hRight - hLeft, 0));
-    float3 bitan = normalize(float3(0, hTop - hBottom, 2.0f * step));
-
-    return cross(bitan, tan);
-
-} */
 OutputType main(InputType input)
 {
     OutputType output;

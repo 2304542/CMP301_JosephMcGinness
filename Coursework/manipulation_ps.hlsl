@@ -2,6 +2,8 @@
 // Calculate diffuse lighting for a single directional light (also texturing)
 
 Texture2D texture0 : register(t0);
+Texture2D HeightMap : register(t1);
+
 SamplerState sampler0 : register(s0);
 
 cbuffer LightBuffer : register(b0)
@@ -18,6 +20,22 @@ struct InputType
     float3 normal : NORMAL;
 };
 
+float3 CalculateNormals(float2 uv)
+{
+    float offset = 1.0f / 1000.0f;
+    float hRight = HeightMap.SampleLevel(sampler0, uv + float2(0.001, 0.0), 0);
+    float hLeft = HeightMap.SampleLevel(sampler0, uv - float2(0.001, 0.0), 0);
+    float hTop = HeightMap.SampleLevel(sampler0, uv + float2(0.0, 0.001), 0);
+    float hBottom = HeightMap.SampleLevel(sampler0, uv - float2(0.0, 0.001), 0);
+
+    float step = 100.0f * offset;
+    float3 tan = normalize(float3(2.0f * step, hRight - hLeft, 0));
+    float3 bitan = normalize(float3(0, hTop - hBottom, 2.0f * step));
+
+    return cross(bitan, tan);
+
+}
+
 // Calculate lighting intensity based on direction and normal. Combine with light colour.
 float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 {
@@ -30,10 +48,18 @@ float4 main(InputType input) : SV_TARGET
 {
     float4 textureColour;
     float4 lightColour;
+    float3 newNormal;
+    float3 vertNormal;
 
 	// Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
     textureColour = texture0.Sample(sampler0, input.tex);
+   
+    newNormal = CalculateNormals(input.tex);
+    vertNormal = input.normal;
+    newNormal = lerp(vertNormal, newNormal, 0.5f);
     lightColour = calculateLighting(-lightDirection, input.normal, diffuseColour);
+    
 	
-    return lightColour * textureColour;
+    return float4(newNormal * 0.5f + 0.5f, 1.0f);
+
 }
