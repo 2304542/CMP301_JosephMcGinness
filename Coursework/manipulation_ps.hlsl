@@ -8,9 +8,13 @@ SamplerState sampler0 : register(s0);
 
 cbuffer LightBuffer : register(b0)
 {
+    float4 ambientColour;
     float4 diffuseColour;
     float3 lightDirection;
     float padding;
+    float3 lightPosition;
+    float padding2;
+    float range;
 };
 
 struct InputType
@@ -40,7 +44,7 @@ float3 CalculateNormals(float2 uv)
 float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 {
     float intensity = saturate(dot(normal, lightDirection));
-    float4 colour = saturate(diffuse * intensity);
+    float4 colour = ambientColour + saturate(diffuse * intensity);
     return colour;
 }
 
@@ -48,18 +52,14 @@ float4 main(InputType input) : SV_TARGET
 {
     float4 textureColour;
     float4 lightColour;
-    float3 newNormal;
-    float3 vertNormal;
+   
 
 	// Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
     textureColour = texture0.Sample(sampler0, input.tex);
-   
-    newNormal = CalculateNormals(input.tex);
-    vertNormal = input.normal;
-    newNormal = lerp(vertNormal, newNormal, 0.5f);
-    lightColour = calculateLighting(-lightDirection, input.normal, diffuseColour);
-    
+    input.normal = CalculateNormals(input.tex);
+    input.normal = normalize(input.normal);
+    lightColour = ambientColour + calculateLighting(-lightDirection, input.normal, diffuseColour);
 	
-    return float4(newNormal * 0.5f + 0.5f, 1.0f);
+    return lightColour * textureColour;
 
 }

@@ -20,10 +20,11 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 
 	sand = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	textureMgr->loadTexture(L"sand", L"res/sand.jpg");
+	textureMgr->loadTexture(L"beach_heightmap", L"res/beach_heightmap.png");
 	// Confirgure directional light
 	light = new Light();
 	light->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
-	light->setDirection(0.7f, -0.7f, 0.0f);
+	light->setDirection(10.0f, 0.7f, 0.0f);
 }
 
 

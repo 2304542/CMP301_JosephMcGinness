@@ -1,7 +1,10 @@
 #include <vector>
 #include "Terrain.h"
 
-/* void Terrain::LoadHeightmap(char* filename, HeightMapInfo& hminfo)
+#define _CRT_SECURE_NO_WARNINGS
+
+
+ void Terrain::LoadHeightmap(char* filename, HeightMapInfo& hminfo)
 {
     FILE* filePtr;                            // Point to the current position in the file
     BITMAPFILEHEADER bitmapFileHeader;        // Structure which stores information about file
@@ -67,4 +70,5 @@
 
     delete[] bitmapImage;
     bitmapImage = 0;
-} */
+} 
+
