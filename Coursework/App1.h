@@ -5,7 +5,9 @@
 // Includes
 #include "DXF.h"
 #include "ManipulationShader.h"
-
+#include "DepthShader.h"
+#include "ShadowShader.h"
+#include "LightShader.h"
 
 class App1 : public BaseApplication
 {
@@ -25,7 +27,11 @@ private:
 	PlaneMesh* sea;
 	PlaneMesh* sand;
 	Light* light;
-	ManipulationShader* shader;
+	ManipulationShader* manipulationShader;
+	DepthShader* depthShader;
+	ShadowShader* shadowShader;
+	LightShader* lightShader;
+	CubeMesh* bunny;
 
 	float time; // enables wave movement 
 
