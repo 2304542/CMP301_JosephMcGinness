@@ -24,18 +24,27 @@ struct InputType
     float3 normal : NORMAL;
 };
 
+float getDisplacement(float2 uv)
+{
+    float offset = HeightMap.SampleLevel(sampler0, uv, 0).r;
+    return offset * 100.0f;
+}
+
+
 float3 CalculateNormals(float2 uv)
 {
-    float offset = 1.0f / 1000.0f;
-    float hRight = HeightMap.SampleLevel(sampler0, uv + float2(0.001, 0.0), 0);
-    float hLeft = HeightMap.SampleLevel(sampler0, uv - float2(0.001, 0.0), 0);
-    float hTop = HeightMap.SampleLevel(sampler0, uv + float2(0.0, 0.001), 0);
-    float hBottom = HeightMap.SampleLevel(sampler0, uv - float2(0.0, 0.001), 0);
-
-    float step = 100.0f * offset;
+   
+    float2 dimensions;
+    HeightMap.GetDimensions(dimensions.x, dimensions.y);
+    float uvOff = 1.0f / min(dimensions.x, dimensions.y);
+    float hTop = getDisplacement(float2(uv.x, uv.y + uvOff));
+    float hBottom = getDisplacement(float2(uv.x, uv.y - uvOff));
+    float hRight = getDisplacement(float2(uv.x + uvOff, uv.y));
+    float hLeft = getDisplacement(float2(uv.x - uvOff, uv.y));
+    
+    float step = 100.0f * uvOff;
     float3 tan = normalize(float3(2.0f * step, hRight - hLeft, 0));
     float3 bitan = normalize(float3(0, hTop - hBottom, 2.0f * step));
-
     return cross(bitan, tan);
 
 }
