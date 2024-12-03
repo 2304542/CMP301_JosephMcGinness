@@ -22,6 +22,8 @@ public:
 protected:
 	bool render();
 	void gui();
+	void depthPass();
+	void finalPass();
 
 private:
 	PlaneMesh* sea;
@@ -32,7 +34,7 @@ private:
 	ShadowShader* shadowShader;
 	LightShader* lightShader;
 	CubeMesh* bunny;
-
+	ShadowMap* shadowMap;
 	float time; // enables wave movement 
 
 	float amplitude = 0.1f; // height of waves
