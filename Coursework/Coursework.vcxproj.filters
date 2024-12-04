@@ -32,7 +32,11 @@
     <ClCompile Include="ShadowShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< Updated upstream
     <ClCompile Include="DepthShader.cpp">
+=======
+    <ClCompile Include="LightShader.cpp">
+>>>>>>> Stashed changes
       <Filter>Source Files</Filter>
     </ClCompile>
 >>>>>>> Stashed changes

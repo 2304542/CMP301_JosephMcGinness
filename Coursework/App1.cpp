@@ -20,7 +20,17 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	// Confirgure directional light
 	light = new Light();
 	light->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
+<<<<<<< Updated upstream
 	light->setDirection(0.7f, -0.7f, 0.0f);
+=======
+	light->setDirection(10.0f, 0.7f, 0.0f);
+
+	// shadow map 
+	int shadowmapWidth = 1024;
+	int shadowmapHeight = 1024;
+	shadowMap = new ShadowMap(renderer->getDevice(), shadowmapWidth, shadowmapHeight);
+
+>>>>>>> Stashed changes
 }
 
 
@@ -76,13 +86,80 @@ bool App1::render()
 	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), light, time, amplitude, speed, frequency);
 	shader->render(renderer->getDeviceContext(), mesh->getIndexCount());
 
+<<<<<<< Updated upstream
+=======
+	
+	WorldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
+	sand->sendData(renderer->getDeviceContext());
+	manipulationShader->setShaderParameters(renderer->getDeviceContext(), WorldMatrix, ViewMatrix, ProjectionMatrix, textureMgr->getTexture(L"sand"), 0, 0, 0, 0);
+	manipulationShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+
+	
+	WorldMatrix = renderer->getWorldMatrix() * XMMatrixTranslation(50.0f, 5.0f, 50.0f);
+	XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
+	WorldMatrix = XMMatrixMultiply(WorldMatrix, ScalingMatrix);
+	bunny->sendData(renderer->getDeviceContext());
+	lightShader->setShaderParameters(renderer->getDeviceContext(), WorldMatrix, ViewMatrix, ProjectionMatrix, textureMgr->getTexture(L"bunny"), light);
+    lightShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
+
+	
+	depthPass();
+	finalPass();
+
+	return true;
+}
+
+void App1::depthPass() {
+	shadowMap->BindDsvAndSetNullRenderTarget(renderer->getDeviceContext());
+
+	// get the world, view, and projection matrices from the camera and d3d objects.
+	light->generateViewMatrix();
+	XMMATRIX lightViewMatrix = light->getViewMatrix();
+	XMMATRIX lightProjectionMatrix = light->getOrthoMatrix();
+	XMMATRIX worldMatrix = renderer->getWorldMatrix();
+
+	sea->sendData(renderer->getDeviceContext());
+	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
+	depthShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+
+	sand->sendData(renderer->getDeviceContext());
+	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
+	depthShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+
+	bunny->sendData(renderer->getDeviceContext());
+	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
+	depthShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+
+	renderer->setBackBufferRenderTarget();
+	renderer->resetViewport();
+
+
+}
+
+void App1::finalPass() {
+	// get the world, view, projection, and ortho matrices from the camera and Direct3D objects.
+	XMMATRIX worldMatrix = renderer->getWorldMatrix();
+	XMMATRIX viewMatrix = camera->getViewMatrix();
+	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
+
+	worldMatrix = XMMatrixTranslation(-50.f, 0.f, -10.f);
+	// Render floor
+	sea->sendData(renderer->getDeviceContext());
+	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
+		textureMgr->getTexture(L"sea"), shadowMap->getDepthMapSRV(), light);
+	shadowShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+
+	sand->sendData(renderer->getDeviceContext());
+	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
+		textureMgr->getTexture(L"sand"), shadowMap->getDepthMapSRV(), light);
+	shadowShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+>>>>>>> Stashed changes
 	// Render GUI
 	gui();
 
 	// Present the rendered scene to the screen.
 	renderer->endScene();
-
-	return true;
+	
 }
 
 void App1::gui()
