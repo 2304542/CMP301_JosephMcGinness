@@ -118,8 +118,9 @@ bool App1::render()
 	//lightShader->setShaderParameters(renderer->getDeviceContext(), WorldMatrix, ViewMatrix, ProjectionMatrix, textureMgr->getTexture(L"bunny"), light);
  //   lightShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
 
-	
+	wavePass();
 	depthPass();
+	
 	finalPass();
 
 	return true;
@@ -157,6 +158,17 @@ void App1::depthPass() {
 
 }
 
+void App1::wavePass() {
+	XMMATRIX ViewMatrix = light->getViewMatrix();
+	XMMATRIX ProjectionMatrix = light->getOrthoMatrix();
+	XMMATRIX worldMatrix = renderer->getWorldMatrix();
+
+
+	XMMatrixTranslation(50.0f, 5.0f, -50.0f);
+	sea->sendData(renderer->getDeviceContext()); // handle geometry 
+	manipulationShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, ViewMatrix, ProjectionMatrix, time, amplitude, speed, frequency);
+	manipulationShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+}
 
 void App1::finalPass() {
 	// get the world, view, projection, and ortho matrices from the camera and Direct3D objects.

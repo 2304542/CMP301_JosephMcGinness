@@ -23,7 +23,7 @@ protected:
 	bool render();
 	void gui();
 	void depthPass();
-
+	void wavePass();
 	void finalPass();
 
 private:
