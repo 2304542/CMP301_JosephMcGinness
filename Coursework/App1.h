@@ -8,6 +8,7 @@
 #include "DepthShader.h"
 #include "ShadowShader.h"
 #include "LightShader.h"
+#include "HeightmapShader.h"
 
 class App1 : public BaseApplication
 {
@@ -22,6 +23,7 @@ public:
 protected:
 	bool render();
 	void gui();
+	void firstPass();
 	void depthPass();
 	void finalPass();
 
@@ -33,6 +35,7 @@ private:
 	DepthShader* depthShader;
 	ShadowShader* shadowShader;
 	LightShader* lightShader;
+	HeightmapShader* heightmapShader;
 	CubeMesh* bunny;
 	ShadowMap* shadowMap;
 	float time; // enables wave movement 
