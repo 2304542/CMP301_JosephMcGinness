@@ -1,3 +1,7 @@
+SamplerState sampler0 : register(s0);
+
+Texture2D HeightMap : register(t0);
+
 cbuffer MatrixBuffer : register(b0)
 {
 
@@ -25,10 +29,18 @@ struct OutputType
     float3 normal : NORMAL;
 };
 
+float getDisplacement(float2 uv)
+{
+    float offset = HeightMap.SampleLevel(sampler0, uv, 0).r;
+    return offset * maxHeight;
+}
+
+
 OutputType main(InputType input)
 {
     OutputType output;
 
+    input.position.y = getDisplacement(input.tex);
 	// Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
     output.position = mul(output.position, viewMatrix);

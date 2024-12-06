@@ -129,10 +129,15 @@ void HeightmapShader::setShaderParameters(ID3D11DeviceContext* deviceContext, co
 	HeightmapBufferType* heightmapPtr;
 	deviceContext->Map(heightmapBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	heightmapPtr = (HeightmapBufferType*)mappedResource.pData;
+	heightmapPtr->maxHeight = 1.0f;
+	heightmapPtr->padding = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	deviceContext->Unmap(heightmapBuffer, 0);
 	deviceContext->VSSetConstantBuffers(1, 1, &heightmapBuffer);
-
+	
 	// Set shader texture resource in the pixel shader.
-
+	deviceContext->PSSetShaderResources(0, 1, &texture);
+	
 	deviceContext->PSSetSamplers(0, 1, &sampleState);
+
+	deviceContext->VSSetShaderResources(0, 1, &heightmapTexture);
 }

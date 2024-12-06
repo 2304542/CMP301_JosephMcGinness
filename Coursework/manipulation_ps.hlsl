@@ -27,7 +27,7 @@ struct InputType
 float getDisplacement(float2 uv)
 {
     float offset = HeightMap.SampleLevel(sampler0, uv, 0).r;
-    return offset * 100.0f;
+    return offset;
 }
 
 

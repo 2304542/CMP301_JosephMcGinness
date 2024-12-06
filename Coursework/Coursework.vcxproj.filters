@@ -33,10 +33,10 @@
     <ClCompile Include="ShadowShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LightShader.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="HeightmapShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
