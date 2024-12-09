@@ -38,12 +38,19 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	shadowMap = new ShadowMap(renderer->getDevice(), shadowmapWidth, shadowmapHeight);
 
 	// Configure directional light
-	light = new Light();
-	light->setAmbientColour(0.3f, 0.3f, 0.3f, 1.0f);
-	light->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
-	light->setDirection(0.0f, -0.7f, 0.7f);
-	light->setPosition(0.f, 0.f, -10.f);
-	light->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
+	light[0] = new Light();
+	light[0]->setAmbientColour(0.3f, 0.3f, 0.3f, 1.0f);
+	light[0]->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
+	light[0]->setDirection(0.0f, -0.7f, 0.7f);
+	light[0]->setPosition(0.f, 0.f, -10.f);
+	light[0]->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
+
+	light[1] = new Light();
+	light[1]->setAmbientColour(1.0f, 0.0f, 0.0f, 1.0f);
+	light[1]->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
+	light[1]->setDirection(0.0f, -0.7f, 0.7f);
+	light[1]->setPosition(0.f, -1.0f, -1.0f);
+	light[1]->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
 }
 
 
@@ -143,9 +150,9 @@ void App1::depthPass() {
 	shadowMap->BindDsvAndSetNullRenderTarget(renderer->getDeviceContext());
 
 	// get the world, view, and projection matrices from the camera and d3d objects.
-	light->generateViewMatrix();
-	XMMATRIX lightViewMatrix = light->getViewMatrix();
-	XMMATRIX lightProjectionMatrix = light->getOrthoMatrix();
+	light[0]->generateViewMatrix();
+	XMMATRIX lightViewMatrix = light[0]->getViewMatrix();
+	XMMATRIX lightProjectionMatrix = light[0]->getOrthoMatrix();
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 
 	sea->sendData(renderer->getDeviceContext()); // handle geometry 
@@ -197,7 +204,7 @@ void App1::finalPass() {
 	worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
 	bunny->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
-		textureMgr->getTexture(L"bunny"), shadowMap->getDepthMapSRV(), light);
+		textureMgr->getTexture(L"bunny"), shadowMap->getDepthMapSRV(), light[0]);
 	shadowShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
 
 		// Render GUI

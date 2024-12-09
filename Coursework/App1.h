@@ -30,7 +30,7 @@ protected:
 private:
 	PlaneMesh* sea;
 	PlaneMesh* sand;
-	Light* light;
+	Light* light[2];
 	ManipulationShader* manipulationShader;
 	DepthShader* depthShader;
 	ShadowShader* shadowShader;

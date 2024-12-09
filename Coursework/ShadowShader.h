@@ -30,6 +30,14 @@ private:
 		float padding;
 	};
 
+	struct LightPosBufferType
+	{
+		XMFLOAT3 lightPosition;
+		float padding;
+		XMFLOAT3 lightPosition2;
+		float padding2;
+	};
+
 public:
 
 	ShadowShader(ID3D11Device* device, HWND hwnd);
