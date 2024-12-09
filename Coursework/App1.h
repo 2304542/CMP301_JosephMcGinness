@@ -23,14 +23,14 @@ public:
 protected:
 	bool render();
 	void gui();
-	void firstPass();
 	void depthPass();
+	void firstPass();
 	void finalPass();
 
 private:
 	PlaneMesh* sea;
 	PlaneMesh* sand;
-	Light* light;
+	Light* light[2];
 	ManipulationShader* manipulationShader;
 	DepthShader* depthShader;
 	ShadowShader* shadowShader;
