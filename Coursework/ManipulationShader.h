@@ -27,7 +27,7 @@ public:
 	ManipulationShader(ID3D11Device* device, HWND hwnd);
 	~ManipulationShader();
 
-	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, float time, float amplitude, float speed, float frequency);
+	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* depthMap, float time, float amplitude, float speed, float frequency);
 
 
 
@@ -37,6 +37,7 @@ private:
 private:
 	ID3D11Buffer* matrixBuffer;
 	ID3D11SamplerState* sampleState;
+	ID3D11SamplerState* sampleStateShadow;
 	ID3D11Buffer* lightBuffer;
 	ID3D11Buffer* timeBuffer;
 };

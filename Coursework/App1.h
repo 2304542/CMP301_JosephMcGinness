@@ -37,7 +37,8 @@ private:
 	LightShader* lightShader;
 	HeightmapShader* heightmapShader;
 	CubeMesh* bunny;
-	ShadowMap* shadowMap;
+	ShadowMap* shadowMap[2];
+	ID3D11ShaderResourceView* shadowMapGetter[2];
 	float time; // enables wave movement 
 
 	float amplitude = 0.1f; // height of waves
