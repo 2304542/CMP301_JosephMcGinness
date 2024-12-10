@@ -30,10 +30,10 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	depthShader = new DepthShader(renderer->getDevice(), hwnd);
 	shadowShader = new ShadowShader(renderer->getDevice(), hwnd);
 	// shadow map 
-	int shadowmapWidth = 4096;
-	int shadowmapHeight = 4096;
-	int sceneWidth = 200;
-	int sceneHeight = 200;
+	int shadowmapWidth = 1024;
+	int shadowmapHeight = 1024;
+	int sceneWidth = 50;
+	int sceneHeight = 50;
 	for (int i = 0; i < 2; i++) {
 		shadowMap[i] = new ShadowMap(renderer->getDevice(), shadowmapWidth, shadowmapHeight);
 	}
@@ -193,7 +193,7 @@ void App1::finalPass() {
 	worldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
 	sand->sendData(renderer->getDeviceContext());
 	heightmapShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
-		textureMgr->getTexture(L"sand"), textureMgr->getTexture(L"beach_heightmap"), shadowMap[0]->getDepthMapSRV(), 3.0f);
+		textureMgr->getTexture(L"sand"), textureMgr->getTexture(L"beach_heightmap"), shadowMapGetter[0], light[0], 3.0f);
 	heightmapShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 
 
@@ -202,7 +202,7 @@ void App1::finalPass() {
 	worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
 	bunny->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
-		textureMgr->getTexture(L"bunny"), shadowMap[0]->getDepthMapSRV(), light[0]);
+		textureMgr->getTexture(L"bunny"), shadowMapGetter[0], light[0]);
 	shadowShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
 
 

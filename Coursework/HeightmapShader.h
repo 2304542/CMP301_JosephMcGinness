@@ -8,11 +8,20 @@ using namespace DirectX;
 class HeightmapShader : public BaseShader
 {
 private:
+	struct MatrixBufferType
+	{
+		XMMATRIX world;
+		XMMATRIX view;
+		XMMATRIX projection;
+		XMMATRIX lightView;
+		XMMATRIX lightProjection;
+	};
 	struct LightBufferType
 	{
 		XMFLOAT4 diffuse;
 		XMFLOAT3 direction;
 		float padding;
+
 	};
 
 	struct HeightmapBufferType
@@ -25,7 +34,7 @@ public:
 	HeightmapShader(ID3D11Device* device, HWND hwnd);
 	~HeightmapShader();
 
-	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* heightmapTexture, ID3D11ShaderResourceView* depthMap, float maxHeight);
+	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* heightmapTexture, ID3D11ShaderResourceView* depthMap, Light* light, float maxHeight);
 
 
 
