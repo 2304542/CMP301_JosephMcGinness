@@ -9,6 +9,8 @@
 #include "ShadowShader.h"
 #include "LightShader.h"
 #include "HeightmapShader.h"
+#include "HorizontalBlurShader.h"
+#include "VerticalBlurShader.h"
 
 class App1 : public BaseApplication
 {
@@ -23,19 +25,31 @@ public:
 protected:
 	bool render();
 	void gui();
-	void depthPass();
+	
 	void firstPass();
+	void verticalBlur();
+	void horizontalBlur();
+	void depthPass();
 	void finalPass();
 
 private:
 	PlaneMesh* sea;
 	PlaneMesh* sand;
+	OrthoMesh* orthoMesh;
 	Light* light[2];
+
 	ManipulationShader* manipulationShader;
 	DepthShader* depthShader;
 	ShadowShader* shadowShader;
 	LightShader* lightShader;
 	HeightmapShader* heightmapShader;
+	HorizontalBlurShader* hBlurShader;
+	VerticalBlurShader* vBlurShader;
+
+	RenderTexture* renderTexture;
+	RenderTexture* hBlurTexture;
+	RenderTexture* vBlurTexture;
+
 	CubeMesh* bunny;
 	ShadowMap* shadowMap[2];
 	ID3D11ShaderResourceView* shadowMapGetter[2];

@@ -111,7 +111,7 @@ void HeightmapShader::initShader(const wchar_t* vsFilename, const wchar_t* psFil
 
 }
 
-void HeightmapShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* heightmapTexture, ID3D11ShaderResourceView* depthMap, Light* light, float maxHeight)
+void HeightmapShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* heightmapTexture, float maxHeight)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -146,7 +146,6 @@ void HeightmapShader::setShaderParameters(ID3D11DeviceContext* deviceContext, co
 	
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &texture);
-	deviceContext->PSSetShaderResources(1, 1, &depthMap);
 	deviceContext->PSSetSamplers(0, 1, &sampleState);
 	deviceContext->PSSetSamplers(1, 1, &sampleStateShadow);
 	deviceContext->VSSetShaderResources(0, 1, &heightmapTexture);
