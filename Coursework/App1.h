@@ -38,6 +38,22 @@ private:
 	OrthoMesh* orthoMesh;
 	Light* light[2];
 
+	AModel* model;
+
+
+
+	XMFLOAT3 lightPos1;
+	XMFLOAT3 lightDir1;
+
+	XMFLOAT3 lightPos2;
+	XMFLOAT3 lightDir2;
+
+	CubeMesh* cube;
+	SphereMesh* sphere;
+
+	XMFLOAT3 cubePos;
+
+
 	ManipulationShader* manipulationShader;
 	DepthShader* depthShader;
 	ShadowShader* shadowShader;

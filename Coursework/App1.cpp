@@ -42,22 +42,22 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	int shadowmapWidth = 1024;
 	int shadowmapHeight = 1024;
 	int sceneWidth = 100;
-	int sceneHeight = 50;
+	int sceneHeight = 100;
 	for (int i = 0; i < 2; i++) {
 		shadowMap[i] = new ShadowMap(renderer->getDevice(), shadowmapWidth, shadowmapHeight);
 	}
 	light[0] = new Light();
 	light[0]->setAmbientColour(0.3f, 0.3f, 0.3f, 1.0f);
 	light[0]->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
-	light[0]->setDirection(0.0f, -1.0f, 0.0f);
-	light[0]->setPosition(-20.f, 10.f, -40.f);
+	light[0]->setDirection(0.0f, -0.7f, 0.7f);
+	light[0]->setPosition(0.0f, 0.0f, 10.0f);
 	light[0]->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
 
 	light[1] = new Light();
 	light[1]->setAmbientColour(1.0f, 0.0f, 0.0f, 1.0f);
 	light[1]->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
-	light[1]->setDirection(0.0f, -0.7f, 0.7f);
-	light[1]->setPosition(0.f, -1.0f, -1.0f);
+	light[1]->setDirection(0.0f, -0.7f, -0.7f);
+	light[1]->setPosition(0.f, 0.0f, -10.0f);
 	light[1]->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
 }
 
@@ -115,7 +115,7 @@ bool App1::render()
 	camera->update();
 
 
-	firstPass();
+	
 	depthPass();
 	finalPass();
 	// Render GUI
@@ -124,68 +124,40 @@ bool App1::render()
 	return true;
 }
 
-void App1::firstPass() {
-
-	shadowMap[0]->BindDsvAndSetNullRenderTarget(renderer->getDeviceContext());
-	// get the world, view, and projection matrices from the camera and d3d objects.
-
-
-	light[0]->generateViewMatrix();
-	XMMATRIX lightViewMatrix = light[0]->getViewMatrix();
-	XMMATRIX lightProjectionMatrix = light[0]->getOrthoMatrix();
-	XMMATRIX worldMatrix = renderer->getWorldMatrix();
-
-	sea->sendData(renderer->getDeviceContext()); // handle geometry 
-	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	depthShader->render(renderer->getDeviceContext(), sea->getIndexCount());
-
-
-	worldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
-	sand->sendData(renderer->getDeviceContext());
-	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	depthShader->render(renderer->getDeviceContext(), sand->getIndexCount());
-
-	worldMatrix = renderer->getWorldMatrix() * XMMatrixTranslation(50.0f, 5.0f, -50.0f);
-	XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
-	worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
-	bunny->sendData(renderer->getDeviceContext());
-	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	depthShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
-
-	renderer->setBackBufferRenderTarget();
-	renderer->resetViewport();
-}
 
 void App1::depthPass() {
-	shadowMap[1]->BindDsvAndSetNullRenderTarget(renderer->getDeviceContext());
+	
 
-	// get the world, view, and projection matrices from the camera and d3d objects.
+	for (int i = 0; i < 2; i++) {
+		shadowMap[i]->BindDsvAndSetNullRenderTarget(renderer->getDeviceContext());
+		// get the world, view, and projection matrices from the camera and d3d objects.
 
 
-		light[1]->generateViewMatrix();
-		XMMATRIX lightViewMatrix = light[1]->getViewMatrix();
-		XMMATRIX lightProjectionMatrix = light[1]->getOrthoMatrix();
+		light[i]->generateViewMatrix();
+		XMMATRIX lightViewMatrix = light[i]->getViewMatrix();
+		XMMATRIX lightProjectionMatrix = light[i]->getOrthoMatrix();
 		XMMATRIX worldMatrix = renderer->getWorldMatrix();
 
-	sea->sendData(renderer->getDeviceContext()); // handle geometry 
-	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	depthShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+		sea->sendData(renderer->getDeviceContext()); // handle geometry 
+		depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
+		depthShader->render(renderer->getDeviceContext(), sea->getIndexCount());
 
 
-	worldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
-	sand->sendData(renderer->getDeviceContext());
-	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	depthShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+		worldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
+		sand->sendData(renderer->getDeviceContext());
+		depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
+		depthShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 
-	worldMatrix = renderer->getWorldMatrix() * XMMatrixTranslation(50.0f, 5.0f, -50.0f);
-	XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
-	worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
-	bunny->sendData(renderer->getDeviceContext());
-	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	depthShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
+		worldMatrix = renderer->getWorldMatrix() * XMMatrixTranslation(50.0f, 5.0f, -50.0f);
+		XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
+		worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
+		bunny->sendData(renderer->getDeviceContext());
+		depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
+		depthShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
 
-	renderer->setBackBufferRenderTarget();
-	renderer->resetViewport();
+		renderer->setBackBufferRenderTarget();
+		renderer->resetViewport();
+	}
 }
 
 void App1::horizontalBlur()
@@ -242,13 +214,21 @@ void App1::finalPass() {
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
+	light[0]->setDirection(0.0f, -0.7f, 0.7f);
+	light[0]->setPosition(0.0f, 0.0f, 10.0f);
 
+		light[1]->setDirection(0.0f, -0.7f, -0.7f);
+	 light[1]->setPosition(0.f, 0.0f, -10.0f);
+
+	ID3D11ShaderResourceView* sm[2];
+	sm[0] = shadowMap[0]->getDepthMapSRV();
+	sm[1] = shadowMap[1]->getDepthMapSRV();
 	// Render floor
 	sea->sendData(renderer->getDeviceContext()); // handle vertex manipulation 
-	manipulationShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), shadowMap[0]->getDepthMapSRV(), time, amplitude, speed, frequency);
+	manipulationShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), time, amplitude, speed, frequency);
 	manipulationShader->render(renderer->getDeviceContext(), sea->getIndexCount());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
-		textureMgr->getTexture(L"sea"), shadowMapGetter[0], light[0]);
+		textureMgr->getTexture(L"sea"), sm, light);
 	shadowShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
 
 	worldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
@@ -257,7 +237,7 @@ void App1::finalPass() {
 		textureMgr->getTexture(L"sand"), textureMgr->getTexture(L"beach_heightmap"), 3.0f);
 	heightmapShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
-		textureMgr->getTexture(L"sea"), shadowMapGetter[0], light[0]);
+		textureMgr->getTexture(L"sea"), sm, light);
 	shadowShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
 
 
@@ -266,7 +246,7 @@ void App1::finalPass() {
 	worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
 	bunny->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
-		textureMgr->getTexture(L"bunny"), shadowMapGetter[0], light[0]);
+		textureMgr->getTexture(L"bunny"), sm, light);
 	shadowShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
 
 
