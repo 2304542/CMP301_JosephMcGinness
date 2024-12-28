@@ -77,15 +77,7 @@ void HeightmapShader::initShader(const wchar_t* vsFilename, const wchar_t* psFil
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	renderer->CreateSamplerState(&samplerDesc, &sampleState);
 
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.BorderColor[0] = 1.0f;
-	samplerDesc.BorderColor[1] = 1.0f;
-	samplerDesc.BorderColor[2] = 1.0f;
-	samplerDesc.BorderColor[3] = 1.0f;
-	renderer->CreateSamplerState(&samplerDesc, &sampleStateShadow);
+
 
 	// Setup light buffer
 	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
@@ -147,6 +139,6 @@ void HeightmapShader::setShaderParameters(ID3D11DeviceContext* deviceContext, co
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &texture);
 	deviceContext->PSSetSamplers(0, 1, &sampleState);
-	deviceContext->PSSetSamplers(1, 1, &sampleStateShadow);
+
 	deviceContext->VSSetShaderResources(0, 1, &heightmapTexture);
 }

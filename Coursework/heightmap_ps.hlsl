@@ -3,7 +3,7 @@
 
 Texture2D texture0 : register(t0);
 Texture2D HeightMap : register(t1);
-Texture2D depthMapTexture[2] : register(t2);
+
 SamplerState sampler0 : register(s0);
 SamplerState shadowSampler : register(s1);
 
@@ -97,23 +97,11 @@ float4 main(InputType input) : SV_TARGET
 {
     float shadowMapBias = 10.00f;
     float4 textureColour;
-    float4 lightColour;
+    float4 lightColour = (1.0, 0.0, 0.0, 1.0);
    
-    for (int i = 0; i < 2; i++)
-    {
-        float2 pTexCoord = getProjectiveCoords(input.lightViewPos);
-    // Shadow test. Is or isn't in shadow
-        if (hasDepthData(pTexCoord))
-        {
-        // Has depth map data
-            if (!isInShadow(depthMapTexture[i], pTexCoord, input.lightViewPos, shadowMapBias))
-            {
-            // is NOT in shadow, therefore light
-                lightColour = calculateLighting(-lightDirection[i], input.normal, diffuseColour[i]);
-            }
-        }
+
         lightColour = saturate(lightColour + ambientColour);
-    }
+    
 
 	// Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
     textureColour = texture0.Sample(sampler0, input.tex);

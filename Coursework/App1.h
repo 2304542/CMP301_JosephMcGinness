@@ -11,6 +11,7 @@
 #include "HeightmapShader.h"
 #include "HorizontalBlurShader.h"
 #include "VerticalBlurShader.h"
+#include "TextureShader.h"
 
 class App1 : public BaseApplication
 {
@@ -61,6 +62,7 @@ private:
 	HeightmapShader* heightmapShader;
 	HorizontalBlurShader* hBlurShader;
 	VerticalBlurShader* vBlurShader;
+	TextureShader* textureShader;
 
 	RenderTexture* renderTexture;
 	RenderTexture* hBlurTexture;
