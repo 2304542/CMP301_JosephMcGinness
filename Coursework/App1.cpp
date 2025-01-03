@@ -75,6 +75,10 @@ App1::~App1()
 		delete bunny;
 		bunny = 0; 
 	}
+	if (orthoMesh) {
+		delete orthoMesh;
+		orthoMesh = 0;
+	}
 }
 
 
@@ -172,6 +176,61 @@ void App1::depthPass() {
 	depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 	depthShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
 
+<<<<<<< Updated upstream
+=======
+		light[i]->generateViewMatrix();
+		XMMATRIX lightViewMatrix = light[i]->getViewMatrix();
+		XMMATRIX lightProjectionMatrix = light[i]->getOrthoMatrix();
+		XMMATRIX worldMatrix = renderer->getWorldMatrix();
+
+		sea->sendData(renderer->getDeviceContext()); // handle geometry 
+		depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix, time, amplitude, speed, frequency);
+		depthShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+
+
+		worldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
+		sand->sendData(renderer->getDeviceContext());
+		depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix, 0, 0, 0, 0);
+		depthShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+
+		worldMatrix = XMMatrixTranslation(0.0, 0.0, -100.0);
+		orthoMesh->sendData(renderer->getDeviceContext());
+		depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix, 0, 0, 0, 0);
+		depthShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+
+		worldMatrix = renderer->getWorldMatrix() * XMMatrixTranslation(50.0f, 5.0f, -50.0f);
+		XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
+		worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
+		bunny->sendData(renderer->getDeviceContext());
+		depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix, 0, 0, 0, 0);
+		depthShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
+
+		renderer->setBackBufferRenderTarget();
+		renderer->resetViewport();
+	}
+}
+
+void App1::horizontalBlur()
+{
+	XMMATRIX worldMatrix, baseViewMatrix, orthoMatrix;
+
+	float screenSizeX = (float)hBlurTexture->getTextureWidth();
+	hBlurTexture->setRenderTarget(renderer->getDeviceContext());
+	hBlurTexture->clearRenderTarget(renderer->getDeviceContext(), 1.0f, 1.0f, 0.0f, 1.0f);
+
+	worldMatrix = renderer->getWorldMatrix();
+	baseViewMatrix = camera->getOrthoViewMatrix();
+	orthoMatrix = hBlurTexture->getOrthoMatrix();
+
+	// Render for Horizontal Blur
+	renderer->setZBuffer(false);
+	orthoMesh->sendData(renderer->getDeviceContext());
+	hBlurShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), screenSizeX);
+	hBlurShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
+	renderer->setZBuffer(true);
+
+	// Reset the render target back to the original back buffer and not the render to texture anymore.
+>>>>>>> Stashed changes
 	renderer->setBackBufferRenderTarget();
 	renderer->resetViewport();
 
@@ -187,9 +246,14 @@ void App1::finalPass() {
 
 	// Render floor
 	sea->sendData(renderer->getDeviceContext()); // handle vertex manipulation 
+<<<<<<< Updated upstream
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
 		textureMgr->getTexture(L"sea"), shadowMap->getDepthMapSRV(), light);
 	shadowShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+=======
+	manipulationShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), time, amplitude, speed, frequency, sm, light);
+	manipulationShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+>>>>>>> Stashed changes
 	
 
 	worldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
@@ -197,7 +261,15 @@ void App1::finalPass() {
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
 		textureMgr->getTexture(L"sand"), shadowMap->getDepthMapSRV(), light);
 	shadowShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+<<<<<<< Updated upstream
 
+=======
+	
+	worldMatrix *= XMMatrixTranslation(0.0, 20.0, 0.0);
+	orthoMesh->sendData(renderer->getDeviceContext());
+	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"));
+	textureShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+>>>>>>> Stashed changes
 
 	worldMatrix = renderer->getWorldMatrix() * XMMatrixTranslation(50.0f, 5.0f, -50.0f);
 	XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);

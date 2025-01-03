@@ -14,6 +14,11 @@ DepthShader::~DepthShader()
 		matrixBuffer->Release();
 		matrixBuffer = 0;
 	}
+	if (timeBuffer) {
+
+		timeBuffer->Release();
+		timeBuffer = 0;
+	}
 
 	// Release the layout.
 	if (layout)
@@ -29,6 +34,7 @@ DepthShader::~DepthShader()
 void DepthShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilename)
 {
 	D3D11_BUFFER_DESC matrixBufferDesc;
+	D3D11_BUFFER_DESC timeBufferDesc;
 
 	// Load (+ compile) shader files
 	loadVertexShader(vsFilename);
@@ -43,9 +49,17 @@ void DepthShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 	matrixBufferDesc.StructureByteStride = 0;
 	renderer->CreateBuffer(&matrixBufferDesc, NULL, &matrixBuffer);
 
+	timeBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	timeBufferDesc.ByteWidth = sizeof(TimeBufferType);
+	timeBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	timeBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	timeBufferDesc.MiscFlags = 0;
+	timeBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer(&timeBufferDesc, NULL, &timeBuffer);
+
 }
 
-void DepthShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix)
+void DepthShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, float time, float amplitude, float speed, float frequency)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -63,4 +77,14 @@ void DepthShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	dataPtr->projection = tproj;
 	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
+
+	TimeBufferType* timePtr;
+	deviceContext->Map(timeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	timePtr = (TimeBufferType*)mappedResource.pData;
+	timePtr->time = time;
+	timePtr->amplitude = amplitude;
+	timePtr->speed = speed;
+	timePtr->frequency = frequency;
+	deviceContext->Unmap(timeBuffer, 0);
+	deviceContext->VSSetConstantBuffers(1, 1, &timeBuffer);
 }
