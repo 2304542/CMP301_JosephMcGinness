@@ -247,6 +247,7 @@ void App1::finalPass() {
 	// Render floor
 	sea->sendData(renderer->getDeviceContext()); // handle vertex manipulation 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
 		textureMgr->getTexture(L"sea"), shadowMap->getDepthMapSRV(), light);
 	shadowShader->render(renderer->getDeviceContext(), sea->getIndexCount());
@@ -254,14 +255,27 @@ void App1::finalPass() {
 	manipulationShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), time, amplitude, speed, frequency, sm, light);
 	manipulationShader->render(renderer->getDeviceContext(), sea->getIndexCount());
 >>>>>>> Stashed changes
+=======
+	manipulationShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), time, amplitude, speed, frequency, sm, light);
+	manipulationShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+
+>>>>>>> Stashed changes
 	
 
 	worldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
 	sand->sendData(renderer->getDeviceContext());
+<<<<<<< Updated upstream
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
 		textureMgr->getTexture(L"sand"), shadowMap->getDepthMapSRV(), light);
 	shadowShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 <<<<<<< Updated upstream
+=======
+	heightmapShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
+		textureMgr->getTexture(L"sand"), textureMgr->getTexture(L"beach_heightmap"), 3.0f);
+	heightmapShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+	
+	
+>>>>>>> Stashed changes
 
 =======
 	
