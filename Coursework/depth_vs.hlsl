@@ -12,6 +12,14 @@ struct InputType
     float3 normal : NORMAL;
 };
 
+cbuffer TimeBuffer : register(b1)
+{
+    float time;
+    float amplitude;
+    float speed;
+    float frequency;
+}
+
 struct OutputType
 {
     float4 position : SV_POSITION;
@@ -20,6 +28,7 @@ struct OutputType
 
 OutputType main(InputType input)
 {
+    input.position.y = cos(input.position.z * frequency + (time * speed)) * amplitude + sin(input.position.x * frequency + (time * speed)) * amplitude;
     OutputType output;
 
     // Calculate the position of the vertex against the world, view, and projection matrices.
