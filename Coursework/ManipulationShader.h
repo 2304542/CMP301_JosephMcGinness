@@ -10,9 +10,10 @@ class ManipulationShader : public BaseShader
 private:
 	struct LightBufferType
 	{
-		XMFLOAT4 diffuse;
-		XMFLOAT3 direction;
-		float padding;
+		XMFLOAT4 ambient[2];
+		XMFLOAT4 diffuse[2];
+		XMFLOAT3 direction[2];
+		XMFLOAT2 padding;
 	};
 
 	struct TimeBufferType

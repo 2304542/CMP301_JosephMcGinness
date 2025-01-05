@@ -12,6 +12,7 @@
 #include "HorizontalBlurShader.h"
 #include "VerticalBlurShader.h"
 #include "TextureShader.h"
+#include "DoFShader.h"
 
 class App1 : public BaseApplication
 {
@@ -27,9 +28,10 @@ protected:
 	bool render();
 	void gui();
 	
-	void firstPass();
+	
 	void verticalBlur();
 	void horizontalBlur();
+	void DepthOfFieldShaderPass();
 	void depthPass();
 	void finalPass();
 
@@ -63,10 +65,12 @@ private:
 	HorizontalBlurShader* hBlurShader;
 	VerticalBlurShader* vBlurShader;
 	TextureShader* textureShader;
+	DepthOfFieldShader* depthOfFieldShader;
 
 	RenderTexture* renderTexture;
 	RenderTexture* hBlurTexture;
 	RenderTexture* vBlurTexture;
+	RenderTexture* depthOfFieldTexture;
 
 	CubeMesh* bunny;
 	ShadowMap* shadowMap[2];

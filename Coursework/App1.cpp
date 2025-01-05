@@ -36,8 +36,10 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	hBlurShader = new HorizontalBlurShader(renderer->getDevice(), hwnd);
 	vBlurShader = new VerticalBlurShader(renderer->getDevice(), hwnd);
 
+	renderTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 	hBlurTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 	vBlurTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
+	depthOfFieldTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 
 	// shadow map 
 	int shadowmapWidth = 1024;
@@ -118,6 +120,9 @@ bool App1::render()
 
 	
 	depthPass();
+	horizontalBlur();
+	verticalBlur();
+	DepthOfFieldShaderPass();
 	finalPass();
 	// Render GUI
 
@@ -149,11 +154,6 @@ void App1::depthPass() {
 		depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix, 0, 0, 0, 0);
 		depthShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 
-		worldMatrix = XMMatrixTranslation(0.0, 0.0, -100.0);
-		orthoMesh->sendData(renderer->getDeviceContext());
-		depthShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, lightViewMatrix, lightProjectionMatrix, 0, 0, 0, 0);
-		depthShader->render(renderer->getDeviceContext(), sand->getIndexCount());
-
 		worldMatrix = renderer->getWorldMatrix() * XMMatrixTranslation(50.0f, 5.0f, -50.0f);
 		XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
 		worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
@@ -180,9 +180,15 @@ void App1::horizontalBlur()
 
 	// Render for Horizontal Blur
 	renderer->setZBuffer(false);
-	orthoMesh->sendData(renderer->getDeviceContext());
+	sea->sendData(renderer->getDeviceContext());
 	hBlurShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), screenSizeX);
-	hBlurShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
+	hBlurShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+	renderer->setZBuffer(true);
+
+	renderer->setZBuffer(false);
+	sand->sendData(renderer->getDeviceContext());
+	hBlurShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), screenSizeX);
+	hBlurShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 	renderer->setZBuffer(true);
 
 	// Reset the render target back to the original back buffer and not the render to texture anymore.
@@ -204,14 +210,51 @@ void App1::verticalBlur()
 
 	// Render for Vertical Blur
 	renderer->setZBuffer(false);
-	orthoMesh->sendData(renderer->getDeviceContext());
+	sea->sendData(renderer->getDeviceContext());
 	vBlurShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, hBlurTexture->getShaderResourceView(), screenSizeY);
-	vBlurShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
+	vBlurShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+	renderer->setZBuffer(true);
+
+	renderer->setZBuffer(false);
+	sand->sendData(renderer->getDeviceContext());
+	vBlurShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, hBlurTexture->getShaderResourceView(), screenSizeY);
+	vBlurShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 	renderer->setZBuffer(true);
 
 	// Reset the render target back to the original back buffer and not the render to texture anymore.
 	renderer->setBackBufferRenderTarget();
+
 }
+
+void App1::DepthOfFieldShaderPass()
+{
+	XMMATRIX worldMatrix, baseViewMatrix, orthoMatrix;
+
+
+	depthOfFieldTexture->setRenderTarget(renderer->getDeviceContext());
+	depthOfFieldTexture->clearRenderTarget(renderer->getDeviceContext(), 0.02f, 0.02f, 0.02f, 1.0f);
+
+	worldMatrix = renderer->getWorldMatrix();
+	baseViewMatrix = camera->getOrthoViewMatrix();
+	// Get the ortho matrix from the render to texture since texture has different dimensions
+	orthoMatrix = depthOfFieldTexture->getOrthoMatrix();
+
+	// Render for Vertical Blur
+	renderer->setZBuffer(false);
+	sea->sendData(renderer->getDeviceContext());
+	//Pass in all the relevant render textures so we can blend between them
+	depthOfFieldShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), vBlurTexture->getShaderResourceView());
+	depthOfFieldShader->render(renderer->getDeviceContext(), sea->getIndexCount());
+	renderer->setZBuffer(true);
+
+	renderer->setZBuffer(false);
+	sand->sendData(renderer->getDeviceContext());
+	//Pass in all the relevant render textures so we can blend between them
+	depthOfFieldShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), vBlurTexture->getShaderResourceView());
+	depthOfFieldShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+	renderer->setZBuffer(true);
+}
+
 
 
 void App1::finalPass() {
@@ -230,28 +273,26 @@ void App1::finalPass() {
 	sm[0] = shadowMap[0]->getDepthMapSRV();
 	sm[1] = shadowMap[1]->getDepthMapSRV();
 	// Render floor
+
+	worldMatrix = XMMatrixTranslation(0.0, 0.0, 5.0);
 	sea->sendData(renderer->getDeviceContext()); // handle vertex manipulation 
-	manipulationShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"sea"), time, amplitude, speed, frequency, sm, light);
+	manipulationShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, 
+		textureMgr->getTexture(L"sea"), time, amplitude, speed, frequency, sm, light);
 	manipulationShader->render(renderer->getDeviceContext(), sea->getIndexCount());
 
-	
-
-	worldMatrix *= XMMatrixTranslation(0.0, 0.0, -100.0);
+	worldMatrix = renderer->getWorldMatrix() * XMMatrixTranslation(0.0, 0.0, -100.0);
 	sand->sendData(renderer->getDeviceContext());
 	heightmapShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
 		textureMgr->getTexture(L"sand"), textureMgr->getTexture(L"beach_heightmap"), 3.0f);
 	heightmapShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 
-	
-
-
 	worldMatrix = renderer->getWorldMatrix() * XMMatrixTranslation(50.0f, 5.0f, -50.0f);
 	XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
 	worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
 	bunny->sendData(renderer->getDeviceContext());
-	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
-		textureMgr->getTexture(L"bunny"));
-	textureShader->render(renderer->getDeviceContext(), sand->getIndexCount());
+	
+
+
 
 
 	gui();

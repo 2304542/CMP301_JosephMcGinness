@@ -6,9 +6,9 @@
 
 Texture2D texture0 : register(t0);
 
-Texture2D HeightMap : register(t1);
 
-Texture2D depthMapTexture[2] : register(t2);
+
+Texture2D depthMapTexture[2] : register(t1);
 
 SamplerState sampler0 : register(s0);
 SamplerState shadowSampler : register(s1);
@@ -39,7 +39,7 @@ struct InputType
 
 float getDisplacement(float2 uv)
 {
-    float offset = HeightMap.SampleLevel(sampler0, uv, 0).r;
+    float offset = texture0.SampleLevel(sampler0, uv, 0).r;
     return offset * 100.0f;
 }
 
@@ -48,7 +48,7 @@ bool hasDepthData(float2 uv)
 
    
     float2 dimensions;
-    HeightMap.GetDimensions(dimensions.x, dimensions.y);
+    texture0.GetDimensions(dimensions.x, dimensions.y);
     float uvOff = 1.0f / min(dimensions.x, dimensions.y);
     float hTop = getDisplacement(float2(uv.x, uv.y + uvOff));
     float hBottom = getDisplacement(float2(uv.x, uv.y - uvOff));
@@ -113,6 +113,7 @@ float4 main(InputType input) : SV_TARGET
     float4 lightColour;
    
 
+
 	// Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
     float4 textureColour = texture0.Sample(sampler0, input.tex);
  
@@ -134,6 +135,6 @@ float4 main(InputType input) : SV_TARGET
         lightColour = saturate(lightColour + ambientColour[i]);
     }
 	
-    return lightColour * textureColour;
+    return saturate(lightColour) * textureColour;
 
 }
