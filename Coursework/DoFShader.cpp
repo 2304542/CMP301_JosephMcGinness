@@ -1,10 +1,10 @@
-
+// Horizontal blur shader
 #include "DoFShader.h"
-
+#include "ShaderFunctions.h"
 
 DepthOfFieldShader::DepthOfFieldShader(ID3D11Device* device, HWND hwnd) : BaseShader(device, hwnd)
 {
-	initShader(L"depthOfField_vs.cso", L"depthOfField_ps.cso");
+	initShader(L"dof_vs.cso", L"dof_ps.cso");
 }
 
 
@@ -31,7 +31,7 @@ DepthOfFieldShader::~DepthOfFieldShader()
 }
 
 
-void DepthOfFieldShader::initShader(WCHAR* vsFilename, WCHAR* psFilename)
+void DepthOfFieldShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilename)
 {
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
@@ -40,6 +40,8 @@ void DepthOfFieldShader::initShader(WCHAR* vsFilename, WCHAR* psFilename)
 	// Load (+ compile) shader files
 	loadVertexShader(vsFilename);
 	loadPixelShader(psFilename);
+
+	ShaderFunctions::CreateBufferDesc(sizeof(MatrixBufferType), &matrixBuffer, renderer);
 
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
@@ -57,27 +59,20 @@ void DepthOfFieldShader::initShader(WCHAR* vsFilename, WCHAR* psFilename)
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	renderer->CreateSamplerState(&samplerDesc, &sampleState);
 
-	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
-	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
-	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	matrixBufferDesc.MiscFlags = 0;
-	matrixBufferDesc.StructureByteStride = 0;
-	renderer->CreateBuffer(&matrixBufferDesc, NULL, &matrixBuffer);
+
 
 
 }
 
 
-void DepthOfFieldShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* sceneTexture, ID3D11ShaderResourceView* blurTexture)
+void DepthOfFieldShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* sceneTexture, ID3D11ShaderResourceView* blurTexture, float nearVal, float farVal, float range, float offset)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	XMMATRIX tworld, tview, tproj;
 
 
-	// Transpose the matrices to prepare them for the shader.
+	// Transpose the matrices to prepare them for the shader
 	tworld = XMMatrixTranspose(worldMatrix);
 	tview = XMMatrixTranspose(viewMatrix);
 	tproj = XMMatrixTranspose(projectionMatrix);
@@ -90,8 +85,7 @@ void DepthOfFieldShader::setShaderParameters(ID3D11DeviceContext* deviceContext,
 	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
-	// Set shader texture resource in the pixel shader.
-	// Pass in our blur and scene texture
+	
 	deviceContext->PSSetShaderResources(0, 1, &sceneTexture);
 	deviceContext->PSSetShaderResources(1, 1, &blurTexture);
 

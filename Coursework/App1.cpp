@@ -35,6 +35,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 
 	hBlurShader = new HorizontalBlurShader(renderer->getDevice(), hwnd);
 	vBlurShader = new VerticalBlurShader(renderer->getDevice(), hwnd);
+	depthOfFieldShader = new DepthOfFieldShader(renderer->getDevice(), hwnd);
 
 	renderTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 	hBlurTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
@@ -191,6 +192,12 @@ void App1::horizontalBlur()
 	hBlurShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 	renderer->setZBuffer(true);
 
+	renderer->setZBuffer(false);
+	bunny->sendData(renderer->getDeviceContext());
+	hBlurShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), screenSizeX);
+	hBlurShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
+	renderer->setZBuffer(true);
+
 	// Reset the render target back to the original back buffer and not the render to texture anymore.
 	renderer->setBackBufferRenderTarget();
 }
@@ -221,6 +228,12 @@ void App1::verticalBlur()
 	vBlurShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 	renderer->setZBuffer(true);
 
+	renderer->setZBuffer(false);
+	bunny->sendData(renderer->getDeviceContext());
+	vBlurShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, hBlurTexture->getShaderResourceView(), screenSizeY);
+	vBlurShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
+	renderer->setZBuffer(true);
+
 	// Reset the render target back to the original back buffer and not the render to texture anymore.
 	renderer->setBackBufferRenderTarget();
 
@@ -243,16 +256,25 @@ void App1::DepthOfFieldShaderPass()
 	renderer->setZBuffer(false);
 	sea->sendData(renderer->getDeviceContext());
 	//Pass in all the relevant render textures so we can blend between them
-	depthOfFieldShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), vBlurTexture->getShaderResourceView());
+	depthOfFieldShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), vBlurTexture->getShaderResourceView(), 1.0f, 1.0f, 1.0f, 1.0f);
 	depthOfFieldShader->render(renderer->getDeviceContext(), sea->getIndexCount());
 	renderer->setZBuffer(true);
 
 	renderer->setZBuffer(false);
 	sand->sendData(renderer->getDeviceContext());
 	//Pass in all the relevant render textures so we can blend between them
-	depthOfFieldShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), vBlurTexture->getShaderResourceView());
+	depthOfFieldShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), vBlurTexture->getShaderResourceView(), 1.0f, 1.0f, 1.0f, 1.0f);
 	depthOfFieldShader->render(renderer->getDeviceContext(), sand->getIndexCount());
 	renderer->setZBuffer(true);
+	renderer->setBackBufferRenderTarget();
+
+	renderer->setZBuffer(false);
+	bunny->sendData(renderer->getDeviceContext());
+	//Pass in all the relevant render textures so we can blend between them
+	depthOfFieldShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), vBlurTexture->getShaderResourceView(), 1.0f, 1.0f, 1.0f, 1.0f);
+	depthOfFieldShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
+	renderer->setZBuffer(true);
+	renderer->setBackBufferRenderTarget();
 }
 
 
@@ -290,7 +312,9 @@ void App1::finalPass() {
 	XMMATRIX ScalingMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
 	worldMatrix = XMMatrixMultiply(worldMatrix, ScalingMatrix);
 	bunny->sendData(renderer->getDeviceContext());
-	
+	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix,
+		textureMgr->getTexture(L"bunny"));
+	textureShader->render(renderer->getDeviceContext(), bunny->getIndexCount());
 
 
 

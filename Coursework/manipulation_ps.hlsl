@@ -132,9 +132,9 @@ float4 main(InputType input) : SV_TARGET
                 lightColour = calculateLighting(-lightDirection[i], input.normal, diffuseColour[i]);
             }
         }
-        lightColour = saturate(lightColour + ambientColour[i]);
+       
     }
 	
-    return saturate(lightColour) * textureColour;
+    return lightColour * textureColour;
 
 }

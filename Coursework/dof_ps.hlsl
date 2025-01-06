@@ -1,8 +1,16 @@
-Texture2D sceneTexture : register(t0);
-Texture2D blurTexture : register(t1);
+Texture2D unblurredSceneTexture : register(t0);
+Texture2D blurSceneTexture : register(t1);
+Texture2D depthSceneTexture : register(t2);
 
-SamplerState Sampler0 : register(s0);
+SamplerState SampleType : register(s0);
 
+cbuffer DepthBuffer : register(b0)
+{
+    float range;
+    float nearValue;
+    float farValue;
+    float offset;
+};
 
 struct InputType
 {
@@ -12,16 +20,21 @@ struct InputType
 
 float4 main(InputType input) : SV_TARGET
 {
-    float weight = 0.5f;
-    float4 sceneSample = sceneTexture.Sample(Sampler0, input.tex);
-    float4 blurSample = blurTexture.Sample(Sampler0, input.tex);
-	// Distance to the center of the screen
-    float centerDist = sceneTexture.Sample(Sampler0, float2(0.5f, 0.5f)).w;
+    float4 colour = float4(0, 0, 0, 1);
+   
+    float4 unblurredScene = unblurredSceneTexture.Sample(SampleType, input.tex);
+    float4 blurScene = blurSceneTexture.Sample(SampleType, input.tex);
+    float depthvalue = depthSceneTexture.Sample(SampleType, input.tex).r;
+    float centreTexel = depthSceneTexture.Sample(SampleType, float2(0.5f, 0.5f)).r;
 
-    //the difference in depth between this and the centre point
-    float depthDifference = abs(centerDist - sceneSample.w) * weight;
 
-	//Get a value based on the difference 
-    return saturate(lerp(sceneSample, blurSample, depthDifference));
+    centreTexel *= (nearValue - farValue);
+    depthvalue *= (nearValue - farValue);
+
+    float s = saturate(abs(depthvalue - centreTexel + offset) / range);
+      
+
+    colour = lerp(unblurredScene, blurScene, s);
+    return colour;
 
 }

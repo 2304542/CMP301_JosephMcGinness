@@ -81,6 +81,11 @@ private:
 	float frequency = 0.1f;
 	float speed = 1.0f;
 
+	float dofDistance = 1.0f;
+	float dofOffset = 0.0f;
+	float vStrength = 1.0;
+	float hStrength = 1.0;
+
 };
 
 #endif
